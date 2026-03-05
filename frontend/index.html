@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CampusConnect — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070910;
+  --surface: #10131c;
+  --surface2: #171d2b;
+  --surface3: #1e2638;
+  --accent: #5b6af5;
+  --accent2: #f05fa9;
+  --accent3: #00e0b8;
+  --text: #e8eaf6;
+  --text2: #7c85a6;
+  --text3: #444d6a;
+  --border: #1e2638;
+  --radius: 18px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); overflow:hidden; }
+
+.page {
+  display:none; width:100vw; height:100vh; align-items:center; justify-content:center;
+  background:
+    radial-gradient(ellipse 100% 70% at 20% 10%, rgba(91,106,245,0.14) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 90%, rgba(240,95,169,0.10) 0%, transparent 60%),
+    var(--bg);
+  position:relative; overflow:hidden;
+}
+.page.active { display:flex; }
+
+/* Grid bg */
+.page::before {
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(rgba(91,106,245,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91,106,245,0.06) 1px, transparent 1px);
+  background-size:50px 50px;
+  pointer-events:none;
+}
+
+/* Floating orbs */
+.orb {
+  position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; animation:float 8s ease-in-out infinite;
+}
+.orb1 { width:400px; height:400px; background:rgba(91,106,245,0.12); top:-100px; left:-100px; }
+.orb2 { width:300px; height:300px; background:rgba(240,95,169,0.10); bottom:-80px; right:-80px; animation-delay:-4s; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-30px)} }
+
+.card {
+  position:relative; z-index:10;
+  background:rgba(16,19,28,0.92);
+  border:1px solid rgba(91,106,245,0.2);
+  border-radius:28px;
+  padding:44px 42px;
+  width:440px; max-width:96vw; max-height:96vh; overflow-y:auto;
+  box-shadow: 0 0 80px rgba(91,106,245,0.12), 0 40px 80px rgba(0,0,0,0.6);
+  backdrop-filter:blur(24px);
+  scrollbar-width:none;
+}
+.card::-webkit-scrollbar { display:none; }
+
+.logo { text-align:center; margin-bottom:34px; }
+.logo-badge {
+  width:68px; height:68px; border-radius:20px; margin:0 auto 14px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  display:flex; align-items:center; justify-content:center; font-size:30px;
+  box-shadow:0 8px 40px rgba(91,106,245,0.5);
+}
+.logo h1 { font-family:'Syne',sans-serif; font-size:26px; font-weight:800; letter-spacing:-0.02em;
+  background:linear-gradient(90deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.logo p { color:var(--text2); font-size:13px; margin-top:4px; }
+
+.tab-row { display:flex; background:var(--surface2); border-radius:12px; padding:4px; margin-bottom:28px; gap:4px; }
+.tab { flex:1; text-align:center; padding:9px; border-radius:9px; cursor:pointer; font-size:14px; font-weight:500; color:var(--text2); transition:all .2s; }
+.tab.active { background:var(--surface3); color:var(--text); box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+
+.field { margin-bottom:16px; }
+.field label { display:block; font-size:11px; font-weight:600; color:var(--text2); margin-bottom:7px; text-transform:uppercase; letter-spacing:.07em; }
+.field input, .field select, .field textarea {
+  width:100%; padding:12px 16px; border-radius:12px;
+  background:var(--surface2); border:1.5px solid var(--border);
+  color:var(--text); font-family:'DM Sans',sans-serif; font-size:14.5px;
+  outline:none; transition:all .2s; resize:none;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color:var(--accent); background:var(--surface3); box-shadow:0 0 0 4px rgba(91,106,245,0.12);
+}
+.field select option { background:var(--surface2); }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.btn {
+  width:100%; padding:14px; border-radius:13px; border:none; cursor:pointer;
+  font-family:'Syne',sans-serif; font-size:15px; font-weight:700; letter-spacing:.01em;
+  transition:all .18s; position:relative; overflow:hidden;
+}
+.btn-primary {
+  background:linear-gradient(135deg,var(--accent),#7c6cf5);
+  color:#fff; box-shadow:0 6px 24px rgba(91,106,245,0.4); margin-top:6px;
+}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 10px 32px rgba(91,106,245,0.5); }
+.btn-primary:active { transform:translateY(0); }
+.btn-primary:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+
+.error { background:rgba(240,95,169,0.1); border:1px solid rgba(240,95,169,0.3); color:#f05fa9; border-radius:10px; padding:10px 14px; font-size:13px; margin-bottom:16px; display:none; }
+.hint { background:rgba(91,106,245,0.1); border:1px solid rgba(91,106,245,0.2); border-radius:10px; padding:12px 14px; font-size:12.5px; color:var(--text2); margin-top:14px; text-align:center; line-height:1.6; }
+.hint strong { color:var(--text); }
+</style>
+</head>
+<body>
+
+<div class="page active" id="authPage">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="card">
+    <div class="logo">
+      <div class="logo-badge">🎓</div>
+      <h1>CampusConnect</h1>
+      <p>Your exclusive university social space</p>
+    </div>
+    <div class="tab-row">
+      <div class="tab active" onclick="switchTab('login')">Login</div>
+      <div class="tab" onclick="switchTab('register')">Join Campus</div>
+    </div>
+    <div class="error" id="authError"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="field">
+        <label>Student ID</label>
+        <input type="text" id="loginId" placeholder="e.g. STU-2024-0001" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="loginPw" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="btn btn-primary" id="loginBtn" onclick="doLogin()">Login to Campus →</button>
+      <div class="hint">Demo accounts: <strong>STU-2024-0001</strong> to <strong>STU-2024-0005</strong><br>Password: <strong>pass123</strong></div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerForm" style="display:none">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="regName" placeholder="Your full name">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Student ID</label>
+          <input type="text" id="regId" placeholder="STU-2024-XXXX">
+        </div>
+        <div class="field">
+          <label>Year</label>
+          <select id="regYear">
+            <option value="">Year</option>
+            <option>1st Year</option><option>2nd Year</option>
+            <option>3rd Year</option><option>4th Year</option>
+            <option>Masters</option><option>PhD</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Department</label>
+        <select id="regDept">
+          <option value="">Select your department</option>
+          <option>Computer Science & Engineering</option>
+          <option>Electrical Engineering</option>
+          <option>Mechanical Engineering</option>
+          <option>Business Administration</option>
+          <option>Physics</option><option>Mathematics</option>
+          <option>Chemistry</option><option>Economics</option>
+          <option>Law</option><option>Medical Sciences</option>
+          <option>Architecture</option><option>Arts & Humanities</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Bio <span style="color:var(--text3);font-weight:400">(optional)</span></label>
+        <textarea id="regBio" rows="2" placeholder="Tell campus about yourself..."></textarea>
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="regPw" placeholder="Min. 6 characters">
+      </div>
+      <button class="btn btn-primary" id="registerBtn" onclick="doRegister()">Create My Account 🎉</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8000/api';
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['login','register'][i]===tab));
+  document.getElementById('loginForm').style.display = tab==='login'?'block':'none';
+  document.getElementById('registerForm').style.display = tab==='register'?'block':'none';
+  hideError();
+}
+
+function showError(msg) {
+  const el=document.getElementById('authError');
+  el.textContent=msg; el.style.display='block';
+}
+function hideError() { document.getElementById('authError').style.display='none'; }
+
+async function doLogin() {
+  const btn=document.getElementById('loginBtn');
+  btn.disabled=true; btn.textContent='Logging in...';
+  hideError();
+  const res = await fetch(`${API}/auth/login`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      student_id: document.getElementById('loginId').value.trim(),
+      password: document.getElementById('loginPw').value
+    })
+  }).catch(()=>null);
+  btn.disabled=false; btn.textContent='Login to Campus →';
+  if (!res || !res.ok) {
+    const err = res ? await res.json() : {};
+    return showError(err.error || 'Cannot connect to server. Is the backend running?');
+  }
+  const data = await res.json();
+  localStorage.setItem('cc_token', data.token);
+  localStorage.setItem('cc_user', JSON.stringify(data.user));
+  window.location.href = 'app.html';
+}
+
+async function doRegister() {
+  const btn=document.getElementById('registerBtn');
+  btn.disabled=true; btn.textContent='Creating account...';
+  hideError();
+  const body = {
+    name: document.getElementById('regName').value.trim(),
+    student_id: document.getElementById('regId').value.trim(),
+    department: document.getElementById('regDept').value,
+    bio: document.getElementById('regBio').value.trim(),
+    password: document.getElementById('regPw').value,
+    year: document.getElementById('regYear').value,
+  };
+  if (!body.name||!body.student_id||!body.department||!body.password) {
+    btn.disabled=false; btn.textContent='Create My Account 🎉';
+    return showError('Please fill in all required fields.');
+  }
+  const res = await fetch(`${API}/auth/register`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  }).catch(()=>null);
+  btn.disabled=false; btn.textContent='Create My Account 🎉';
+  if (!res || !res.ok) {
+    const err = res ? await res.json() : {};
+    return showError(err.error || 'Cannot connect to server.');
+  }
+  const data = await res.json();
+  localStorage.setItem('cc_token', data.token);
+  localStorage.setItem('cc_user', JSON.stringify(data.user));
+  window.location.href = 'app.html';
+}
+
+// Redirect if already logged in
+if (localStorage.getItem('cc_token')) window.location.href='app.html';
+</script>
+</body>
+</html>
